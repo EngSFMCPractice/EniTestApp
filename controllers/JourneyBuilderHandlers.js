@@ -47,7 +47,7 @@ exports.JourneyBuilderExecute = async (req) => {
                         ]
                     };
 
-                    const url = `https://${env.MC_SUBDOMAIN}.rest.marketingcloudapis.com/data/v1/async/dataextensions/key:${env.DE_KEY}/rows`;
+                    const url = `https://mc9hp147ft752v3mml4vn69cfwm4.rest.marketingcloudapis.com/data/v1/async/dataextensions/key:${env.DE_KEY}/rows`;
 
                     const resDE = await axios.post(url, body, {
                         headers: {

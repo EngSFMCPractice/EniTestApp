@@ -6,7 +6,7 @@
 
 - app.js: Express server, serves static `public/` and mounts journey-builder routes at `/jb`.
 - routes/index.js: HTTP endpoints used by Journey Builder (`/save`, `/validate`, `/publish`, `/execute`, `/getPush`). These forward to `controllers/JourneyBuilderHandlers.js` or `functions/global-functions.js`.
-- controllers/JourneyBuilderHandlers.js: primary handler logic for execute/validate/save/publish. `JourneyBuilderExecute` decodes the SFMC JWT (via `functions/global-functions.JWTdecode`), reads `inArguments`, replaces personalization tokens, then either posts to `API_URL` or inserts into WordPress (via `functions/wp-config.js`).
+- controllers/JourneyBuilderHandlers.js: primary handler logic for execute/validate/save/publish. `JourneyBuilderExecute` decodes the SFMC JWT (via `functions/global-functions.JWTdecode`), reads `inArguments`, replaces personalization tokens, then routes based on `Switch` field: `'on'` → posts to `API_URL`, `'sfmc'` → sends push via SFMC BU Child token, otherwise → inserts into WordPress (via `functions/wp-config.js`).
 - public/: front-end custom activity code (see `public/js/customActivity.js` and `public/config.json`) — this is the code SFMC loads inside the Journey Builder canvas.
 - functions/: helper modules (JWT decode, SFMC token retrieval, WP integration, cron upload to SFMC). Database helpers live in `db-config.js` (Postgres via `DATABASE_URL`).
 
@@ -19,10 +19,11 @@
 Minimal `.env` keys (inferred from code):
 - PORT
 - SFMC_JWT
+- SFMC_ROOT_AUTH, SFMC_CLIENT_ID, SFMC_CLIENT_SECRET, SFMC_ACCOUNT_ID (parent account)
+- SFMC_CLIENT_ID_BUCHILD, SFMC_CLIENT_SECRET_BUCHILD, SFMC_ACCOUNT_ID_BUCHILD (BU Child account for push sends)
+- SFMC_ROOT_REST, SFMC_EXT_KEY
 - API_URL
 - WProotApi, WordpressUser, WordpressPsw
-- SFMC_ROOT_AUTH, SFMC_CLIENT_ID, SFMC_CLIENT_SECRET, SFMC_ACCOUNT_ID
-- SFMC_ROOT_REST, SFMC_EXT_KEY
 - DATABASE_URL
 
 Only documentable facts are listed above; do not invent additional runtime steps.
@@ -37,7 +38,8 @@ Only documentable facts are listed above; do not invent additional runtime steps
 
 ## Integration points and external dependencies
 
-- SFMC: token and REST endpoints via `functions/global-functions` and cron job in `functions/cron.js` (uses `SFMC_ROOT_AUTH`, `SFMC_ROOT_REST`, `SFMC_EXT_KEY`).
+- SFMC Parent Account: token retrieval via `functions/global-functions.getTokenSFMC()` and cron job in `functions/cron.js` (uses `SFMC_ROOT_AUTH`, `SFMC_ROOT_REST`, `SFMC_EXT_KEY`). Used for retrieving push definitions and uploading log history.
+- SFMC BU Child Account: token retrieval via `functions/global-functions.getTokenSFMCBUChild()` used by `JourneyBuilderExecute` when `Switch='sfmc'` to send push messages via SFMC messaging API (uses `SFMC_ROOT_AUTH`, `SFMC_CLIENT_ID_BUCHILD`, `SFMC_CLIENT_SECRET_BUCHILD`, `SFMC_ACCOUNT_ID_BUCHILD`).
 - WordPress: `functions/wp-config.js` posts to wp-json endpoints and expects `WProotApi`, `WordpressUser`, `WordpressPsw` env vars.
 - Postgres: `db-config.js` uses `DATABASE_URL` and provides `insertLogHistory` and `getLogHistory` used by helpers and cron.
 
@@ -45,6 +47,7 @@ Only documentable facts are listed above; do not invent additional runtime steps
 
 - Add a new Journey Builder endpoint: edit `routes/index.js` and call a new function exported by `controllers/JourneyBuilderHandlers.js`. Follow the existing pattern: `let result = await handler(req.body); res.sendStatus(result);`.
 - To send a decoded, safe payload from the client: look at `public/js/customActivity.js` — server expects `inArguments` shaped like `[fields, personalizationMap]` and JWT-signed payloads.
+- Verify a push with a contact: call `/jb/verifyPush` (POST) with `{pushID, contactID}`. The function `functions/global-functions.verifyPushOnSFMC` uses the parent account token to send a test push to SFMC; useful for configuration validation from the UI.
 
 ## What not to change without confirmation
 

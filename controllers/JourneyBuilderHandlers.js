@@ -1,6 +1,6 @@
 const axios = require('axios');
 const env = process.env;
-const {JWTdecode, logPushHistory} = require('../functions/global-functions');
+const {JWTdecode, logPushHistory, getTokenSFMCBUChild} = require('../functions/global-functions');
 const {WPgetAccessToken, WPexecuteInsert} = require('../functions/wp-config');
 
 exports.JourneyBuilderSave = async () => {
@@ -50,7 +50,7 @@ exports.JourneyBuilderExecute = async (req) => {
 
                 try{
                     if(decodedArgs[0].Switch == 'on'){
-                        //Postbin
+                        
                         res = await axios.post(env.API_URL, decodedArgs[0],
                             {
                                 headers: {
@@ -58,6 +58,28 @@ exports.JourneyBuilderExecute = async (req) => {
                                 }
                             }
                         );
+                    }else if(decodedArgs[0].Switch == 'sfmc'){
+                        //Send push to SFMC using BU Child token
+                        let TokenSFMCChild = await getTokenSFMCBUChild();
+                        if(TokenSFMCChild != null){
+                            res = await axios.post(env.SFMC_ROOT_REST + 'messaging/v1/messageDefinitionSends/create', 
+                                {
+                                    "To": {
+                                        "Address": decodedArgs[0].subscriberEmail || decoded.keyValue
+                                    },
+                                    "MessageKey": decodedArgs[0].Msg_ID
+                                },
+                                {
+                                    headers: {
+                                        'Content-Type': 'application/json',
+                                        'Authorization': 'Bearer ' + TokenSFMCChild.token
+                                    }
+                                }
+                            );
+                        }else{
+                            console.error('SFMC BU Child Token doesn\'t exist!');
+                            res = { status: 401 };
+                        }
                     }else{
                         //WP
                         let TokenWP = await WPgetAccessToken();

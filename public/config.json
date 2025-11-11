@@ -7,7 +7,7 @@
     "type": "REST",
     "lang": {
         "en-US": {
-            "name": "Push History",
+            "name": "EniLive Push Send",
           "description": "Lorem ipsum"
         }
     },
@@ -15,7 +15,7 @@
         "execute": {
            "inArguments":[],
           "outArguments": [],
-          "url": "https://icare-push-history-acc2833ada57.herokuapp.com/jb/execute",
+          "url": "https://enipushactivity-dbd633e587d1.herokuapp.com/jb/execute",
            "verb": "POST",
             "body": "",
             "header": "",
@@ -30,17 +30,17 @@
     "configurationArguments": {
         "applicationExtensionKey": "52a47946-1301-44ce-93bc-31126b1d2e13",
       "save": {
-        "url": "https://icare-push-history-acc2833ada57.herokuapp.com/jb/save",
+        "url": "https://enipushactivity-dbd633e587d1.herokuapp.com/jb/save",
         "verb": "POST",
         "useJwt": true
        },
        "publish": {
-        "url": "https://icare-push-history-acc2833ada57.herokuapp.com/jb/publish",
+        "url": "https://enipushactivity-dbd633e587d1.herokuapp.com/jb/publish",
         "verb": "POST",
         "useJwt": true
        },
       "validate": {
-        "url": "https://icare-push-history-acc2833ada57.herokuapp.com/jb/validate",
+        "url": "https://enipushactivity-dbd633e587d1.herokuapp.com/jb/validate",
         "verb": "POST",
         "useJwt": true
       }

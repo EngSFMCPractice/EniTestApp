@@ -1,0 +1,58 @@
+#push-info label.form-label{
+    font-size:14px;
+    color:#16325c!important;
+}
+
+.needs-validation.was-validated .form-control.is-invalid,
+.needs-validation .form-control.is-invalid {
+    border-color: #dc3545;
+    padding-right: calc(1.5em + .75rem);
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' width='12' height='12' fill='none' stroke='%23dc3545'%3e%3ccircle cx='6' cy='6' r='4.5'/%3e%3cpath stroke-linejoin='round' d='M5.8 3.6h.4L6 6.5z'/%3e%3ccircle cx='6' cy='8.2' r='.6' fill='%23dc3545' stroke='none'/%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right calc(.375em + .1875rem) center;
+    background-size: calc(.75em + .375rem) calc(.75em + .375rem);
+}
+.needs-validation.was-validated .form-control.is-invalid:valid:focus{
+    box-shadow:0 0 0 .25rem rgba(220, 53, 69, .25);
+    border-color:#dc3545;
+}
+
+
+.was-validated #placeholder-text:valid{ 
+    background-image:url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23343a40' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e")!important;
+    border-color:#dee2e6!important;
+}
+.was-validated #placeholder-text:focus{
+    border-color:#86b7fe!important;
+    box-shadow:0 0 0 .25rem rgba(13,110,253,.25)!important;
+}
+.form-control, .form-select, .form-check-input{
+    box-shadow:0px 0px 8px -2px rgba(0,0,0,.1)!important;
+}
+#no-push-found{
+    color:#dc3545;
+    font-size:14px;
+}
+
+/* LOADER */
+#loader {
+    width: 50px;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    border: 8px solid lightblue;
+    border-right-color: #1F5FBF;
+    animation: l2 1s infinite linear;
+    position:absolute;
+    top:50%;left:50%;
+    margin-top:-25px;
+    margin-left:-25px;
+    z-index:999;
+}
+#loader-overlay{
+    position:absolute;
+    width:100%;
+    height:100%;
+    background-color:rgba(255, 255, 255, .5);
+    z-index:998;
+}
+@keyframes l2 {to{transform: rotate(1turn)}}

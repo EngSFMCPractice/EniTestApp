@@ -1,0 +1,102 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="css/style.css">
+    <link rel="stylesheet" type="text/css" href="bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.2/css/all.css" integrity="sha384-oS3vJWv+0UjzBfQzYUhtDYW+Pj2yciDJxpsK1OYPAYjqT085Qq/1cq5FLXAZQ7Ay" crossorigin="anonymous">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="https://unpkg.com/axios@1.6.8/dist/axios.min.js"></script>
+    <script src="bootstrap/js/bootstrap.bundle.js"></script>
+    <script src="/js/require.js"></script>
+    <script type="text/javascript">
+        (function () {
+            var config = {
+                baseUrl: 'js'
+            };
+
+            var dependencies = [
+                'customActivity'
+            ];
+
+            require(config, dependencies);
+        })();
+    </script>
+    <title>Icare | Push History</title>
+</head>
+<body>
+    <div class="container my-5">
+        <div class="row">
+            <div class="col" style="position:relative;">
+                <div id="loader-wrap"></div>
+                <form id="push-info" class="needs-validation">
+                    <div class="mb-3">
+                        <label for="Msg_Title" class="form-label">Title:</label>
+                        <input type="text" class="form-control" id="Msg_Title" name="Msg_Title" autocomplete="off" required>
+                        <div class="invalid-feedback"></div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="Msg_Short" class="form-label">Short message (its allow personalization strings):</label>
+                        <input type="text" class="form-control" id="Msg_Short" name="Msg_Short" autocomplete="off" required>
+                        <div class="invalid-feedback"></div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="Msg_Long" class="form-label">Long message (its allow personalization strings):</label>
+                        <textarea class="form-control" id="Msg_Long" name="Msg_Long" rows="7" required></textarea>
+                        <div class="invalid-feedback"></div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label"><i class="fas fa-database"></i>&nbsp;Entry data fields: <span id="no-de-selected"></span></label>
+                        <div class="row">
+                            <div class="col-7">
+                                <select class="form-select" aria-label="Text placeholder" id="placeholder-text"></select>
+                            </div>
+                            <div class="col-5">
+                                <a class="btn btn-primary mb-3 w-100" id="insert-placeholder" onclick="addPlaceholder()"><i class="fas fa-plus-circle" style="margin-right:5px;"></i>Add placeholder</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Select push to historicize:</label>
+                        <select class="form-select" aria-label="Text placeholder" id="Msg_Push_Element" name="Msg_Push_Element"></select>
+                        <div class="invalid-feedback"></div>
+                        <span id="no-push-found"></span>
+                    </div>
+                    <div class="mb-3">
+                        <label for="Msg_Name" class="form-label">Message name:</label> 
+                        <input type="text" class="form-control" id="Msg_Name" autocomplete="off" name="Msg_Name" required>
+                        <div class="invalid-feedback"></div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="Msg_ID" class="form-label">Message ID:</label>
+                        <input type="text" class="form-control" id="Msg_ID" autocomplete="off" name="Msg_ID" required>
+                        <div class="invalid-feedback"></div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="Msg_URL" class="form-label">Message URL:</label>
+                        <input type="text" class="form-control" id="Msg_URL" autocomplete="off" name="Msg_URL">
+                        <div class="invalid-feedback"></div>
+                    </div>
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" role="switch" id="wordpress-postbin" name="wordpress-postbin">
+                        <label class="form-check-label" for="wordpress-postbin">Off::Wordpress / On::Postbin</label>
+                      </div>
+                </form>
+
+                <script>
+                    function addPlaceholder() {
+                        let placeholderSelected = $('#placeholder-text').val();
+                        if (placeholderSelected) {
+                            let textarea = $('#Msg_Long').val();
+                            $('#Msg_Long').val(textarea + '${' + placeholderSelected + '}');
+                        }
+                        return false;
+                    }
+
+                </script>
+            </div>
+        </div>
+    </div>
+    
+</body>
+</html>

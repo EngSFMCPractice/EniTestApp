@@ -1,0 +1,61 @@
+{
+    "workflowApiVersion": "1.1",
+    "metaData": {
+        "icon": "images/icare-icon.png",
+        "category": "custom"
+    },
+    "type": "REST",
+    "lang": {
+        "en-US": {
+            "name": "Push History",
+          "description": "Lorem ipsum"
+        }
+    },
+    "arguments": {
+        "execute": {
+           "inArguments":[],
+          "outArguments": [],
+          "url": "https://icare-push-history-acc2833ada57.herokuapp.com/jb/execute",
+           "verb": "POST",
+            "body": "",
+            "header": "",
+            "format": "json",
+            "useJwt": true,
+            "timeout": 30000,
+            "retryCount": 3,
+            "retryDelay": 5000,
+            "concurrentRequests": 5
+        }
+    },
+    "configurationArguments": {
+        "applicationExtensionKey": "52a47946-1301-44ce-93bc-31126b1d2e13",
+      "save": {
+        "url": "https://icare-push-history-acc2833ada57.herokuapp.com/jb/save",
+        "verb": "POST",
+        "useJwt": true
+       },
+       "publish": {
+        "url": "https://icare-push-history-acc2833ada57.herokuapp.com/jb/publish",
+        "verb": "POST",
+        "useJwt": true
+       },
+      "validate": {
+        "url": "https://icare-push-history-acc2833ada57.herokuapp.com/jb/validate",
+        "verb": "POST",
+        "useJwt": true
+      }
+    },
+    "userInterfaces": {
+        "configInspector": {
+            "size": "medium"
+        }
+    },
+    "schema": {
+        "arguments": {
+            "execute": {
+                "inArguments": [],
+                "outArguments": []
+            }
+        }
+    }
+}

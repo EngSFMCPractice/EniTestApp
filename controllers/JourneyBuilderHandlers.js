@@ -1,6 +1,6 @@
 const axios = require('axios');
 const env = process.env;
-const {JWTdecode, logPushHistory, getTokenSFMCBUChild} = require('../functions/global-functions');
+const {JWTdecode, logPushHistory} = require('../functions/global-functions');
 const {WPgetAccessToken, WPexecuteInsert} = require('../functions/wp-config');
 
 exports.JourneyBuilderSave = async () => {
@@ -16,112 +16,68 @@ exports.JourneyBuilderPublish = async () => {
 }
 
 exports.JourneyBuilderExecute = async (req) => {
-    try{
+    try {
         const decoded = await JWTdecode(req, env.SFMC_JWT);
 
         if (decoded && decoded.inArguments && decoded.inArguments.length > 0) {
-            
             let decodedArgs = decoded.inArguments;
-            
-            if(decodedArgs){
 
-                let res;
-                let inputFields = ['Msg_Long', 'Msg_Short'];
+            const subscriberKey = decoded.keyValue;
+            const pushId = decodedArgs[0].Msg_Push_Element;
+            const pushName = decodedArgs[0].Push_Name || '';
+            const contactId = decodedArgs[1].ContactID_relazionato;
 
-                //Replace personalization strings for all occurrencies
-                for (let i = 0; i < inputFields.length; i++) {
-                    decodedArgs[0][inputFields[i]] = decodedArgs[0][inputFields[i]].replace(/\$\{([^}]+)\}/g, 
-                        (match, captured) => decodedArgs[1][captured]);
-                    
-                }
-
-                let logReq = {
-                        SubscriberKey: decoded.keyValue,
-                        Msg_ID: decodedArgs[0].Msg_ID,
-                        JourneyId: decoded.journeyId,
-                        ActivityId: decoded.activityId,
-                        ActivityObjectID: decoded.activityObjectID,
-                        Status: '',
-                        Error_Message: ''
-                };
-
-                console.log('*** Decode inArguments after replace ***');
-                console.log(decodedArgs);
-
-                try{
-                    if(decodedArgs[0].Switch == 'on'){
-                        
-                        res = await axios.post(env.API_URL, decodedArgs[0],
-                            {
-                                headers: {
-                                    'Content-Type': 'application/json'
-                                }
-                            }
-                        );
-                    }else if(decodedArgs[0].Switch == 'sfmc'){
-                        //Send push to SFMC using BU Child token
-                        let TokenSFMCChild = await getTokenSFMCBUChild();
-                        if(TokenSFMCChild != null){
-                            res = await axios.post(env.SFMC_ROOT_REST + 'messaging/v1/messageDefinitionSends/create', 
-                                {
-                                    "To": {
-                                        "Address": decodedArgs[0].subscriberEmail || decoded.keyValue
-                                    },
-                                    "MessageKey": decodedArgs[0].Msg_ID
-                                },
-                                {
-                                    headers: {
-                                        'Content-Type': 'application/json',
-                                        'Authorization': 'Bearer ' + TokenSFMCChild.token
-                                    }
-                                }
-                            );
-                        }else{
-                            console.error('SFMC BU Child Token doesn\'t exist!');
-                            res = { status: 401 };
-                        }
-                    }else{
-                        //WP
-                        let TokenWP = await WPgetAccessToken();
-                        if(TokenWP != null){
-                            res = await WPexecuteInsert(TokenWP, decodedArgs[0]);
-                        }else{
-                            console.error('The Token doesn\'t exist!');
-                            res = { status: 404 };
-                        }
-
-                    }
-                    
-                    if(res.status != '200'){
-                        let logPush = await logPushHistory(logReq, null, res.status);
-                        console.log('*** Log push History ***');
-                        console.log(logPush);
-                    }
-
-                    return res.status;
-
-                }catch(e){
-                    console.error(e);
-                    let logPush = await logPushHistory(logReq, e, null);
-                    console.log('*** Log push History ***');
-                    console.log(logPush);
-
-                    return e.response.status;
-                    
-                }
-            }else{
-                console.error('Argument decoded not found.');
-                return 404;
+            // Ottieni token SFMC
+            const token = await getTokenSFMC();
+            if (!token) {
+                console.error('Unable to retrieve SFMC token');
+                return 500;
             }
 
+            // Prepara il body per inserire nella Data Extension
+            const body = {
+                items: [
+                    {
+                        SubscriberKey: subscriberKey,
+                        ContactID_relazionato: contactId,
+                        PushID: pushId,
+                        PushName: pushName
+                    }
+                ]
+            };
+
+            // Inserisci nella Data Extension
+            const deKey = env.DE_KEY; // Assicurati che DE_KEY sia impostato nelle variabili di ambiente
+            const resDE = await axios.post(env.API_URL, body, {
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            console.log('*** Inserted into DE ***', resDE.status);
+
+            // Log dell'operazione
+            let logReq = {
+                SubscriberKey: subscriberKey,
+                Msg_Push_Element: pushId,
+                Push_Name: pushName,
+                JourneyId: decoded.journeyId,
+                ActivityId: decoded.activityId,
+                ActivityObjectID: decoded.activityObjectID,
+                Status: resDE.status,
+                Error_Message: ''
+            };
+
+            await logPushHistory(logReq, null, resDE.status);
+
+            return resDE.status;
         } else {
             console.error('inArguments invalid.');
             return 400;
         }
-
-    }catch(e){
+    } catch (e) {
         console.error(e);
         return 500;
     }
-
-}
+};

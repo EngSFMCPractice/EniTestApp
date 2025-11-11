@@ -28,52 +28,53 @@ exports.JourneyBuilderExecute = async (req) => {
             const contactId = decodedArgs[1].ContactID_relazionato;
 
             // Risposta immediata a Journey Builder
-            setImmediate(async () => {
-                try {
-                    const token = await getTokenSFMC();
-                    if (!token) {
-                        console.error('Unable to retrieve SFMC token');
-                        return;
-                    }
+setImmediate(async () => {
+    try {
+        const token = await getTokenSFMC();
+        if (!token) {
+            console.error('Unable to retrieve SFMC token');
+            return;
+        }
 
-                    const body = {
-                        items: [
-                            {
-                                SubscriberKey: subscriberKey,
-                                ContactID_relazionato: contactId,
-                                PushID: pushId,
-                                PushName: pushName
-                            }
-                        ]
-                    };
-
-                    const url = `https://mc9hp147ft752v3mml4vn69cfwm4.rest.marketingcloudapis.com/data/v1/async/dataextensions/key:${env.DE_KEY}/rows`;
-
-                    const resDE = await axios.post(url, body, {
-                        headers: {
-                            'Authorization': `Bearer ${token}`,
-                            'Content-Type': 'application/json'
-                        },
-                        timeout: 8000
-                    });
-
-                    console.log('*** Inserted into DE ***', resDE.status);
-
-                    await logPushHistory({
-                        SubscriberKey: subscriberKey,
-                        Msg_Push_Element: pushId,
-                        Push_Name: pushName,
-                        JourneyId: decoded.journeyId,
-                        ActivityId: decoded.activityId,
-                        ActivityObjectID: decoded.activityObjectID,
-                        Status: resDE.status,
-                        Error_Message: ''
-                    }, null, resDE.status);
-
-                } catch (e) {
-                    console.error('Async error:', e);
+        const body = {
+            items: [
+                {
+                    SubscriberKey: subscriberKey,
+                    ContactID_relazionato: contactId,
+                    PushID: pushId,
+                    PushName: pushName
                 }
-            });
+            ]
+        };
+
+        const url = `https://mc9hp147ft752v3mml4vn69cfwm4.rest.marketingcloudapis.com/data/v1/dataextensions/key:${env.DE_KEY}/rows`;
+
+        const resDE = await axios.post(url, body, {
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
+            timeout: 8000
+        });
+
+        console.log('*** Inserted into DE ***', resDE.status);
+        console.log('*** DE Response Data:', resDE.data);
+
+        await logPushHistory({
+            SubscriberKey: subscriberKey,
+            Msg_Push_Element: pushId,
+            Push_Name: pushName,
+            JourneyId: decoded.journeyId,
+            ActivityId: decoded.activityId,
+            ActivityObjectID: decoded.activityObjectID,
+            Status: resDE.status,
+            Error_Message: ''
+        }, null, resDE.status);
+
+    } catch (e) {
+        console.error('Async error:', e.response?.data || e);
+    }
+});
 
             return 200; // Risposta immediata
         } else {

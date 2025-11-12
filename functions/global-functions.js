@@ -39,7 +39,7 @@ exports.getTokenSFMC = async () =>{
 
 exports.getTokenSFMCBuChild = async () =>{
     try{
-        let res = await axios.post(env.SFMC_ROOT_AUTH_BUCHILD + 'v2/token', {
+        let res = await axios.post(env.SFMC_ROOT_AUTH + 'v2/token', {
             grant_type: "client_credentials",
             client_id: env.SFMC_CLIENT_ID_BUCHILD,
             client_secret: env.SFMC_CLIENT_SECRET_BUCHILD,

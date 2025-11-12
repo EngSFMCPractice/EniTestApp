@@ -37,6 +37,24 @@ exports.getTokenSFMC = async () =>{
 
 }
 
+exports.getTokenSFMCBuChild = async () =>{
+    try{
+        let res = await axios.post(env.SFMC_ROOT_AUTH_BUCHILD + 'v2/token', {
+            grant_type: "client_credentials",
+            client_id: env.SFMC_CLIENT_ID_BUCHILD,
+            client_secret: env.SFMC_CLIENT_SECRET_BUCHILD,
+            account_id: env.SFMC_ACCOUNT_ID_BUCHILD
+        });
+
+        return res.status == 200 && res.data.access_token ? {token: res.data.access_token, expire: res.data.expires_in} : null;
+
+    } catch(e){
+        console.error(e);
+        return null;
+    }
+
+}
+
 exports.getPushSFMC = async (req) =>{
     if(req.token){
         try{

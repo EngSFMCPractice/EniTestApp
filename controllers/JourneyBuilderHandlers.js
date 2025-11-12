@@ -1,6 +1,6 @@
 const axios = require('axios');
 const env = process.env;
-const {JWTdecode, logPushHistory} = require('../functions/global-functions');
+const {JWTdecode, logPushHistory, getTokenSFMCBuChild} = require('../functions/global-functions');
 const {WPgetAccessToken, WPexecuteInsert} = require('../functions/wp-config');
 
 exports.JourneyBuilderSave = async () => {
@@ -18,7 +18,7 @@ exports.JourneyBuilderPublish = async () => {
 
 exports.JourneyBuilderExecute = async (req) => {
     try {
-        const decoded = await JWTdecode(req, env.SFMC_JWT);
+        const decoded = await JWTdecode(req, env.SFMC_JWT_BUCHILD);
 
         if (decoded && decoded.inArguments && decoded.inArguments.length > 0) {
             const decodedArgs = decoded.inArguments;
@@ -30,7 +30,7 @@ exports.JourneyBuilderExecute = async (req) => {
             // Risposta immediata a Journey Builder
 setImmediate(async () => {
     try {
-        const token = await getTokenSFMC();
+        const token = await getTokenSFMCBuChild();
         if (!token) {
             console.error('Unable to retrieve SFMC token');
             return;

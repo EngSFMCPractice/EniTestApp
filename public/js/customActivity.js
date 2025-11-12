@@ -95,11 +95,12 @@ define([
                     
                     if(payloadPush.length > 0){
                         payloadPush.forEach(item => {
-                            if (inArguments && inArguments[0]) {
-                                selectPushHTML += '<option value="' + item.id + '"' + (inArguments[0].Msg_Push_Element == item.id ? ' selected' : '') + '>' + item.name + '</option>';
-                            } else {
-                                selectPushHTML += '<option value="' + item.id + '">' + item.name + '</option>';
-                            }
+                        if (inArguments && inArguments[0]) {
+                               selectPushHTML += '<option value="' + item.id + '" data-title="' + title + '" data-message="' + message + '"' + 
+                             (inArguments[0].Msg_Push_Element == item.id ? ' selected' : '') + '>' + item.name + '</option>';
+                        } else {
+                                selectPushHTML += '<option value="' + item.id + '" data-title="' + title + '" data-message="' + message + '">' + item.name + '</option>';
+             }
                         });
 
                         $('#Msg_Push_Element').html(selectPushHTML);
@@ -188,6 +189,8 @@ define([
             payload['arguments'].execute.inArguments[0] = {
                 Msg_Push_Element: pushInfo.get('Msg_Push_Element'),
                 Push_Name: $('#Msg_Push_Element option:selected').text(),
+                Push_Title: selectedOption.getAttribute('data-title'),
+                Push_Message: selectedOption.getAttribute('data-message'),
                 Switch: pushInfo.get('wordpress-postbin')
             };
     

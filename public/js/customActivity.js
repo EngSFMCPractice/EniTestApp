@@ -189,8 +189,7 @@ define([
             payload['arguments'].execute.inArguments[0] = {
                 Msg_Push_Element: pushInfo.get('Msg_Push_Element'),
                 Push_Name: $('#Msg_Push_Element option:selected').text(),
-                Push_Title: selectedOption.getAttribute('data-title'),
-                Push_Message: selectedOption.getAttribute('data-message'),
+                Push_Message: $('#Msg_Push_Element option:selected').data('message'),
                 Switch: pushInfo.get('wordpress-postbin')
             };
     

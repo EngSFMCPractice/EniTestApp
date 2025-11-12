@@ -30,7 +30,8 @@ exports.JourneyBuilderExecute = async (req) => {
             // Risposta immediata a Journey Builder
 setImmediate(async () => {
     try {
-        const token = await getTokenSFMCBuChild();
+        const tokenResponse = await getTokenSFMCBuChild();
+        const token = tokenResponse ? tokenResponse.token : null;
         if (!token) {
             console.error('Unable to retrieve SFMC token');
             return;

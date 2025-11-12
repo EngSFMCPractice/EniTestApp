@@ -76,7 +76,7 @@ exports.getPushSFMC = async (req) =>{
                         name: item.name,
                         customerKey: item.customerKey,
                         objectID: item.objectID,
-                        message: item.Content,
+                        content: item.Content,
                     };
                 
                     filteredItems.push(filteredItem);

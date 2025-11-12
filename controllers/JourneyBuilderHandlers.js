@@ -16,7 +16,7 @@ exports.JourneyBuilderPublish = async () => {
 }
 
 
-exports.JourneyBuilderExecute = async (req) => {
+exports.JourneyBuilderExecute = async (req, res) => {
     try {
         console.log('=== JourneyBuilderExecute CALLED ===');
         console.log('req.body type:', typeof req.body);

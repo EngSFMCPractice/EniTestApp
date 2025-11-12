@@ -21,6 +21,7 @@ exports.JourneyBuilderExecute = async (req) => {
             setImmediate(async () => {
                 try {
                     const token = await getTokenSFMCBuChild();
+                    console.log("Token retrieved:", token);
                     if (!token) {
                         console.error('Unable to retrieve SFMC token');
                         // Log error in logPushHistory
@@ -53,7 +54,7 @@ exports.JourneyBuilderExecute = async (req) => {
                     try {
                         const resDE = await axios.post(url, body, {
                             headers: {
-                                'Authorization': `Bearer ${token}`,
+                                'Authorization': `Bearer ${token.token}`,
                                 'Content-Type': 'application/json'
                             },
                             timeout: 8000

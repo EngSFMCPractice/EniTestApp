@@ -1,26 +1,14 @@
 const axios = require('axios');
 const env = process.env;
-const {JWTdecode, logPushHistory, getTokenSFMCBuChild} = require('../functions/global-functions');
-const {WPgetAccessToken, WPexecuteInsert} = require('../functions/wp-config');
+const { JWTdecode, logPushHistory, getTokenSFMCBuChild } = require('../functions/global-functions');
 
-exports.JourneyBuilderSave = async () => {
-    return 200;
-}
+exports.JourneyBuilderSave = async () => 200;
+exports.JourneyBuilderValidate = async () => 200;
+exports.JourneyBuilderPublish = async () => 200;
 
-exports.JourneyBuilderValidate = async () => {
-    return 200;
-}
-
-exports.JourneyBuilderPublish = async () => {
-    return 200;
-}
-
-
-exports.JourneyBuilderExecute = async (req, res) => {
+exports.JourneyBuilderExecute = async (req) => {
     try {
-        console.log('=== JourneyBuilderExecute CALLED ===');
-        const rawJWT = req.body?.jwt || req.body;
-        const decoded = await JWTdecode(rawJWT, env.SFMC_JWT_BUCHILD);
+        const decoded = await JWTdecode(req, env.SFMC_JWT);
 
         if (decoded && decoded.inArguments && decoded.inArguments.length > 0) {
             const decodedArgs = decoded.inArguments;
@@ -29,27 +17,78 @@ exports.JourneyBuilderExecute = async (req, res) => {
             const pushName = decodedArgs[0].Push_Name || '';
             const contactId = decodedArgs[1].ContactID_relazionato;
 
-            // Risposta immediata a Journey Builder
-            res.sendStatus(200); // ← rispondi subito
-
-            // Async background
+            // Respond immediately to Journey Builder to avoid timeout
             setImmediate(async () => {
                 try {
-                    const tokenResponse = await getTokenSFMCBuChild();
-                    const token = tokenResponse?.token;
-                    if (!token) return console.error('Unable to retrieve SFMC token');
+                    const token = await getTokenSFMCBuChild();
+                    if (!token) {
+                        console.error('Unable to retrieve SFMC token');
+                        // Log error in logPushHistory
+                        await logPushHistory({
+                            SubscriberKey: subscriberKey,
+                            Msg_Push_Element: pushId,
+                            Push_Name: pushName,
+                            JourneyId: decoded.journeyId,
+                            ActivityId: decoded.activityId,
+                            ActivityObjectID: decoded.activityObjectID,
+                            Status: 'ERROR',
+                            Error_Message: 'Token retrieval failed'
+                        }, null, 'ERROR');
+                        return;
+                    }
 
                     const body = {
-                        items: [{ SubscriberKey: subscriberKey, ContactID_relazionato: contactId, PushID: pushId, PushName: pushName }]
+                        items: [
+                            {
+                                SubscriberKey: subscriberKey,
+                                ContactID_relazionato: contactId,
+                                PushID: pushId,
+                                PushName: pushName
+                            }
+                        ]
                     };
 
-                    const url = `https://mc9hp147ft752v3mml4vn69cfwm4.rest.marketingcloudapis.com/data/v1/dataextensions/key:${env.DE_KEY}/rows`;
-                    const resDE = await axios.post(url, body, {
-                        headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
-                        timeout: 8000
-                    });
+                    const url = `https://${env.MC_SUBDOMAIN}.rest.marketingcloudapis.com/data/v1/async/dataextensions/key:${env.DE_KEY}/rows`;
 
-                    console.log('*** Inserted into DE ***', resDE.status);
+                    try {
+                        const resDE = await axios.post(url, body, {
+                            headers: {
+                                'Authorization': `Bearer ${token}`,
+                                'Content-Type': 'application/json'
+                            },
+                            timeout: 8000
+                        });
+
+                        console.log('*** Inserted into DE ***', resDE.status);
+
+                        await logPushHistory({
+                            SubscriberKey: subscriberKey,
+                            Msg_Push_Element: pushId,
+                            Push_Name: pushName,
+                            JourneyId: decoded.journeyId,
+                            ActivityId: decoded.activityId,
+                            ActivityObjectID: decoded.activityObjectID,
+                            Status: resDE.status,
+                            Error_Message: ''
+                        }, null, resDE.status);
+
+                    } catch (apiError) {
+                        console.error('Error inserting into DE:', apiError.message);
+                        // Attempt to log error in DE or logPushHistory
+                        await logPushHistory({
+                            SubscriberKey: subscriberKey,
+                            Msg_Push_Element: pushId,
+                            Push_Name: pushName,
+                            JourneyId: decoded.journeyId,
+                            ActivityId: decoded.activityId,
+                            ActivityObjectID: decoded.activityObjectID,
+                            Status: 'ERROR',
+                            Error_Message: apiError.message
+                        }, null, 'ERROR');
+                    }
+
+                } catch (e) {
+                    console.error('Async error:', e);
                     await logPushHistory({
                         SubscriberKey: subscriberKey,
                         Msg_Push_Element: pushId,
@@ -57,19 +96,19 @@ exports.JourneyBuilderExecute = async (req, res) => {
                         JourneyId: decoded.journeyId,
                         ActivityId: decoded.activityId,
                         ActivityObjectID: decoded.activityObjectID,
-                        Status: resDE.status,
-                        Error_Message: ''
-                    }, null, resDE.status);
-                } catch (e) {
-                    console.error('Async error:', e.response?.data || e);
+                        Status: 'ERROR',
+                        Error_Message: e.message
+                    }, null, 'ERROR');
                 }
             });
+
+            return 200; // Immediate response
         } else {
             console.error('inArguments invalid.');
-            res.sendStatus(400); // rispondi con 400
+            return 400;
         }
     } catch (e) {
         console.error(e);
-        res.sendStatus(500); // rispondi con 500
+        return 500;
     }
 };

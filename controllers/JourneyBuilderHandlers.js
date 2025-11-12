@@ -20,8 +20,11 @@ exports.JourneyBuilderExecute = async (req) => {
     try {
         const rawJWT = req.body?.jwt || req.body;
         const decoded = await JWTdecode(rawJWT, env.SFMC_JWT_BUCHILD);
-        console.log('Type of req.body:', typeof req.body);
-        console.log('Keys:', Object.keys(req.body));
+        console.log('=== JourneyBuilderExecute called ===');
+        console.log('Body type:', typeof req.body);
+        console.log('Body keys:', Object.keys(req.body));
+        console.log('Body sample:', JSON.stringify(req.body).substring(0, 200));
+
 
         if (decoded && decoded.inArguments && decoded.inArguments.length > 0) {
             const decodedArgs = decoded.inArguments;

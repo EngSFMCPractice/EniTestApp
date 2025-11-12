@@ -18,7 +18,10 @@ exports.JourneyBuilderPublish = async () => {
 
 exports.JourneyBuilderExecute = async (req) => {
     try {
-        const decoded = await JWTdecode(req, env.SFMC_JWT_BUCHILD);
+        const rawJWT = req.body?.jwt || req.body;
+        const decoded = await JWTdecode(rawJWT, env.SFMC_JWT_BUCHILD);
+        console.log('Type of req.body:', typeof req.body);
+        console.log('Keys:', Object.keys(req.body));
 
         if (decoded && decoded.inArguments && decoded.inArguments.length > 0) {
             const decodedArgs = decoded.inArguments;
@@ -57,7 +60,7 @@ setImmediate(async () => {
             },
             timeout: 8000
         });
-
+        
         console.log('*** Inserted into DE ***', resDE.status);
         console.log('*** DE Response Data:', resDE.data);
 

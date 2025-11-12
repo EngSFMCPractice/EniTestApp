@@ -19,11 +19,11 @@ exports.JourneyBuilderPublish = async () => {
 exports.JourneyBuilderExecute = async (req) => {
     try {
         const rawJWT = req.body?.jwt || req.body;
+        console.log('Raw JWT:', rawJWT ? 'Present' : 'Missing');
+        console.log('Env SFMC_JWT_BUCHILD:', !!env.SFMC_JWT_BUCHILD);
+
         const decoded = await JWTdecode(rawJWT, env.SFMC_JWT_BUCHILD);
-        console.log('=== JourneyBuilderExecute called ===');
-        console.log('Body type:', typeof req.body);
-        console.log('Body keys:', Object.keys(req.body));
-        console.log('Body sample:', JSON.stringify(req.body).substring(0, 200));
+        console.log('Decoded JWT:', decoded);
 
 
         if (decoded && decoded.inArguments && decoded.inArguments.length > 0) {

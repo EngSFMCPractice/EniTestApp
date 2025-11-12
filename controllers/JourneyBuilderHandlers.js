@@ -18,6 +18,10 @@ exports.JourneyBuilderPublish = async () => {
 
 exports.JourneyBuilderExecute = async (req) => {
     try {
+        console.log('=== JourneyBuilderExecute CALLED ===');
+        console.log('req.body type:', typeof req.body);
+        console.log('req.body keys:', Object.keys(req.body));
+        console.log('req.body sample:', JSON.stringify(req.body).substring(0, 300));
         const rawJWT = req.body?.jwt || req.body;
         console.log('Raw JWT:', rawJWT ? 'Present' : 'Missing');
         console.log('Env SFMC_JWT_BUCHILD:', !!env.SFMC_JWT_BUCHILD);

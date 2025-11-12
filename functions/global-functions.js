@@ -76,7 +76,7 @@ exports.getPushSFMC = async (req) =>{
                         name: item.name,
                         customerKey: item.customerKey,
                         objectID: item.objectID,
-                        content: item.views.push.meta.options.customBlockData["display:message"]
+                        content: item.name
                     };
                 
                     filteredItems.push(filteredItem);

@@ -21,7 +21,6 @@ exports.JourneyBuilderExecute = async (req) => {
             setImmediate(async () => {
                 try {
                     const token = await getTokenSFMCBuChild();
-                    console.log("Token retrieved:", token);
                     if (!token) {
                         console.error('Unable to retrieve SFMC token');
                         // Log error in logPushHistory

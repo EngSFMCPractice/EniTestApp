@@ -96,10 +96,10 @@ define([
                     if(payloadPush.length > 0){
                         payloadPush.forEach(item => {
                         if (inArguments && inArguments[0]) {
-                               selectPushHTML += '<option value="' + item.id + '" data-title="' + title + '" data-message="' + message + '"' + 
+                               selectPushHTML += '<option value="' + item.id + '" data-message="' + message + '"' + 
                              (inArguments[0].Msg_Push_Element == item.id ? ' selected' : '') + '>' + item.name + '</option>';
                         } else {
-                                selectPushHTML += '<option value="' + item.id + '" data-title="' + title + '" data-message="' + message + '">' + item.name + '</option>';
+                                selectPushHTML += '<option value="' + item.id + '" data-message="' + message + '">' + item.name + '</option>';
              }
                         });
 

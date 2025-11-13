@@ -42,6 +42,18 @@ define([
             loader.parentNode.removeChild(loader);
         }
     }
+
+
+function escapeHtml(str) {
+    if (!str) return '';
+    return str
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+}
+
     
 
     function initialize(data) {
@@ -96,10 +108,10 @@ define([
                     if(payloadPush.length > 0){
                         payloadPush.forEach(item => {
                         if (inArguments && inArguments[0]) {
-                               selectPushHTML += '<option value="' + item.id + '" data-message="' + item.name + '"' + 
+                               selectPushHTML += '<option value="' + item.id + '" data-title="' + escapeHtml(item.displayTitle || '') + '" data-message="' + escapeHtml(item.displayMessage || '') + '"' + 
                              (inArguments[0].Msg_Push_Element == item.id ? ' selected' : '') + '>' + item.name + '</option>';
                         } else {
-                                selectPushHTML += '<option value="' + item.id + '" data-message="' + item.name + '">' + item.name + '</option>';
+                                selectPushHTML += '<option value="' + item.id + '" data-title="' + escapeHtml(item.displayTitle || '') +'" data-message="' + escapeHtml(item.displayMessage || '') + '">' + item.name + '</option>';
              }
                         });
 
@@ -190,6 +202,7 @@ define([
                 Msg_Push_Element: pushInfo.get('Msg_Push_Element'),
                 Push_Name: $('#Msg_Push_Element option:selected').text(),
                 Push_Message: $('#Msg_Push_Element option:selected').data('message'),
+                Push_Title: $('#Msg_Push_Element option:selected').data('title'),
                 Switch: pushInfo.get('wordpress-postbin')
             };
     

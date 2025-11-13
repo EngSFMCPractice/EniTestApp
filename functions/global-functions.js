@@ -68,15 +68,16 @@ exports.getPushSFMC = async (req) =>{
             if (jsonPayload.hasOwnProperty('items') && jsonPayload.items.length > 0) {
                 const itemsArray = jsonPayload.items;
                 const filteredItems = [];
-    
                 itemsArray.forEach(item => {
-    
+                    const customBlockData = item?.views?.push?.meta?.options?.customBlockData || {};
                     const filteredItem = {
                         id: item.id,
                         name: item.name,
                         customerKey: item.customerKey,
                         objectID: item.objectID,
-                        content: item.name
+                        displayTitle: customBlockData["display:title"] || null,
+                        displayMessage: customBlockData["display:message"] || null
+
                     };
                 
                     filteredItems.push(filteredItem);

@@ -17,6 +17,7 @@ exports.JourneyBuilderExecute = async (req) => {
             const pushName = decodedArgs[0].Push_Name || '';
             const pushContent = decodedArgs[0].Push_Message || '';
             const pushTitle = decodedArgs[0].Push_Title || '';
+            const pushSubtitle = decodedArgs[0].Push_Subtitle || '';
             const contactId = decodedArgs[1].ContactID_relazionato;
 
             // Respond immediately to Journey Builder to avoid timeout
@@ -47,7 +48,8 @@ exports.JourneyBuilderExecute = async (req) => {
                                 PushID: pushId,
                                 PushName: pushName,
                                 PushContent: pushContent,
-                                PushTitle: pushTitle
+                                PushTitle: pushTitle,
+                                PushSubtitle: pushSubtitle
                             }
                         ]
                     };

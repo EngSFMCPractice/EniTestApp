@@ -108,10 +108,10 @@ function escapeHtml(str) {
                     if(payloadPush.length > 0){
                         payloadPush.forEach(item => {
                         if (inArguments && inArguments[0]) {
-                               selectPushHTML += '<option value="' + item.id + '" data-title="' + escapeHtml(item.displayTitle || '') + '" data-message="' + escapeHtml(item.displayMessage || '') + '"' + 
+                               selectPushHTML += '<option value="' + item.id + '" data-title="' + escapeHtml(item.displayTitle || '') +  '" data-subtitle="' + escapeHtml(item.displaySubtitle || '') + '" data-message="' + escapeHtml(item.displayMessage || '') + '"' + 
                              (inArguments[0].Msg_Push_Element == item.id ? ' selected' : '') + '>' + item.name + '</option>';
                         } else {
-                                selectPushHTML += '<option value="' + item.id + '" data-title="' + escapeHtml(item.displayTitle || '') +'" data-message="' + escapeHtml(item.displayMessage || '') + '">' + item.name + '</option>';
+                                selectPushHTML += '<option value="' + item.id + '" data-title="' + escapeHtml(item.displayTitle || '') +  '" data-subtitle="' + escapeHtml(item.displaySubtitle || '') + '" data-message="' + escapeHtml(item.displayMessage || '') + '">' + item.name + '</option>';
              }
                         });
 
@@ -203,6 +203,7 @@ function escapeHtml(str) {
                 Push_Name: $('#Msg_Push_Element option:selected').text(),
                 Push_Message: $('#Msg_Push_Element option:selected').data('message'),
                 Push_Title: $('#Msg_Push_Element option:selected').data('title'),
+                Push_Subtitle: $('#Msg_Push_Element option:selected').data('subtitle'),
                 Switch: pushInfo.get('wordpress-postbin')
             };
     

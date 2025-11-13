@@ -76,6 +76,7 @@ exports.getPushSFMC = async (req) =>{
                         customerKey: item.customerKey,
                         objectID: item.objectID,
                         displayTitle: customBlockData["display:title"] || null,
+                        displaySubtitle: customBlockData["display:subtitle"] || null,
                         displayMessage: customBlockData["display:message"] || null
 
                     };
